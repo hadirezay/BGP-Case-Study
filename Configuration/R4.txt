@@ -1,0 +1,214 @@
+Current configuration : 3262 bytes
+!
+! Last configuration change at 07:02:12 UTC Tue May 18 2021
+!
+version 16.7
+service timestamps debug datetime msec
+service timestamps log datetime msec
+platform qfp utilization monitor load 80
+no platform punt-keepalive disable-kernel-core
+!
+hostname R4
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+no ip domain lookup
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+!
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+license udi pid ISR4321/K9 sn FDO21162L5Y
+license boot level securityk9
+no license smart enable
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+!
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no ip address
+ ipv6 address FE80::4 link-local
+ ipv6 address 2001:DB8:FEED::1/64
+!
+interface Loopback4
+ no ip address
+ ipv6 address FE80::4 link-local
+ ipv6 address 2001:DB8:FEED:4::1/64
+!
+interface Loopback8
+ no ip address
+ ipv6 address FE80::4 link-local
+ ipv6 address 2001:DB8:FEED:8::1/64
+!
+interface Loopback12
+ no ip address
+ ipv6 address FE80::4 link-local
+ ipv6 address 2001:DB8:FEED:12::1/64
+!
+interface GigabitEthernet0/0/0
+ ip address 192.168.14.2 255.255.255.252
+ negotiation auto
+ ipv6 address FE80::4 link-local
+ ipv6 address 2001:DB8:FEED:14::2/64
+!
+interface GigabitEthernet0/0/1
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface Serial0/1/0
+ ip address 192.168.34.2 255.255.255.252
+ ipv6 address FE80::4 link-local
+ ipv6 address 2001:DB8:FEED:34::2/64
+!
+interface Serial0/1/1
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0
+ vrf forwarding Mgmt-intf
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+router eigrp DUAL-STACK
+ !
+ address-family ipv4 unicast autonomous-system 65002
+  !
+  af-interface GigabitEthernet0/0/0
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Serial0/1/0
+   passive-interface
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 192.168.14.0 0.0.0.3
+  network 192.168.34.0 0.0.0.3
+  eigrp router-id 1.1.1.1
+ exit-address-family
+!
+router bgp 65002
+ bgp router-id 4.4.4.4
+ bgp log-neighbor-changes
+ neighbor 2001:DB8:FEED:14::1 remote-as 65001
+ neighbor 2001:DB8:FEED:34::1 remote-as 65001
+ neighbor 192.168.14.1 remote-as 65001
+ neighbor 192.168.34.1 remote-as 65001
+ !
+ address-family ipv4
+  no neighbor 2001:DB8:FEED:14::1 activate
+  no neighbor 2001:DB8:FEED:34::1 activate
+  neighbor 192.168.14.1 activate
+  neighbor 192.168.34.1 activate
+ exit-address-family
+ !
+ address-family ipv6
+  network 2001:DB8:FEED::/64
+  network 2001:DB8:FEED:4::/64
+  network 2001:DB8:FEED:8::/64
+  network 2001:DB8:FEED:12::/64
+  aggregate-address 2001:DB8:FEED::/59 summary-only
+  neighbor 2001:DB8:FEED:14::1 activate
+  neighbor 2001:DB8:FEED:34::1 activate
+ exit-address-family
+!
+ip forward-protocol nd
+ip http server
+ip http authentication local
+ip http secure-server
+ip tftp source-interface GigabitEthernet0
+!
+!
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ transport input none
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0 4
+ login
+!
+wsma agent exec
+!
+wsma agent config
+!
+wsma agent filesys
+!
+wsma agent notify
+!
+!
+end
